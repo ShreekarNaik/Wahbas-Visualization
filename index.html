@@ -17,15 +17,18 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "https://cdn.skypack.dev/three@0.132.2",
-					"jsm/": "https://cdn.skypack.dev/three@0.132.2/examples/jsm/"
+					"three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
+					"jsm/": "https://cdn.skypack.dev/three@0.172.0/examples/jsm/",
+					"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
 				}
 			}
 		</script>
 	</head>
 	<body>
 		<!-- Import main.js as an ES6 module -->
-		<script type="module" src="main.js"></script>
-		<!-- <div> Debugging </div> -->
+		<!-- <script type="module" src="main.js"></script> -->
+
+		<script type="module" src="svg_render_test.js"></script>
+		<!-- <div>Debugging</div> -->
 	</body>
 </html>
