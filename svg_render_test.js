@@ -5,6 +5,10 @@ import { SVGRenderer } from "three/addons/renderers/SVGRenderer.js";
 import { TTFLoader } from "three/addons/loaders/TTFLoader.js";
 import { FontLoader } from "three/addons/loaders/FontLoader.js";
 import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import { InfiniteGridHelper } from "./InfiniteGridHelper.js";
+import themes from "./theme.js";
+
+const currentTheme = themes.currentTheme;
 
 console.log(THREE);
 
@@ -134,13 +138,49 @@ function init() {
 		}
 	);
 
-	// // Add a grid helper to the scene
+	// Add a grid helper to the scene
 	// const gridHelper = new THREE.GridHelper(10, 10);
 	// // increase the line thickness
-	// gridHelper.material.linewidth = 1;
 	// // add a radial gradient from the origin to outer side of the grid
-
 	// scene.add(gridHelper);
+	// const gridHelper = new InfiniteGridHelper(
+	// 	2,
+	// 	4,
+	// 	currentTheme.gridColor,
+	// 	100
+	// );
+
+	// // color the grid lines white.
+	// // gridHelper.material.color.set(0xffffff);
+	// scene.add(gridHelper);
+
+	// Testing gradient line
+	const points = [
+		new THREE.Vector3(0, 0, 0), // Origin
+		new THREE.Vector3(5, 0, 0), // End point
+	];
+	const bgeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+	// Colors for the gradient (start fully visible, fade to background color)
+	const colors = new Float32Array([
+		0.0,
+		0.0,
+		0.0,
+		1.0, // Black (RGBA) at the origin
+		1.0,
+		1.0,
+		1.0,
+		0.0, // White fully transparent at the endpoint
+	]);
+	bgeometry.setAttribute("color", new THREE.BufferAttribute(colors, 4));
+
+	// Line material with vertex colors enabled
+	const bmaterial = new THREE.LineBasicMaterial({ vertexColors: true });
+	// set the line width
+	bmaterial.linewidth = 10;
+	const bline = new THREE.Line(bgeometry, bmaterial);
+	scene.add(bline);
+	// Testing ends here
 
 	window.addEventListener("resize", onWindowResize);
 }
