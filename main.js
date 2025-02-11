@@ -3,6 +3,10 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { InfiniteGridHelper } from "./InfiniteGridHelper.js";
 import themes from "./theme.js";
 
+const numeric = window.numeric; // Numeric.js is already loaded globally
+
+console.log(numeric.add([1, 2, 3], [4, 5, 6])); // Output: [5, 7, 9]
+
 const currentTheme = themes.currentTheme;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -121,12 +125,20 @@ function getvs(R, w, noise_level) {
 }
 
 function wabhas(ws, vs) {
+	// Determine the dimension from the first vector in vs
+
 	// temporary return
 	let R_est = new THREE.Matrix3();
 	R_est.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
 	return R_est;
 }
 
+///
+/// Math helpers Not tested
+
+// Helper function to compute determinant using LU decomposition
+///
+///
 addAxes(scene);
 const rotationMatrix = generateRotationMatrix(
 	new THREE.Vector3(1, -2, 0),
