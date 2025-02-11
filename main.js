@@ -83,6 +83,50 @@ function visualizeRotation(scene, R, length = 0.5) {
 	scene.add(createArrow(kNew, currentTheme.arrowZColor, 3)); // Light blue for rotated Z
 }
 
+function updateA(t) {
+	// Dynamic vector A based on time t
+	return new THREE.Vector3(
+		Math.sin(t / 1000),
+		Math.cos(t / 1000),
+		1
+	).normalize();
+}
+
+const B = new THREE.Vector3(1, 2, 3).normalize();
+
+// Add original fixed axes for reference
+const xAxis = createArrow(new THREE.Vector3(1, 0, 0), 0xff0000, 4.5); // Red for X
+const yAxis = createArrow(new THREE.Vector3(0, 1, 0), 0x00ff00, 4.5); // Green for Y
+const zAxis = createArrow(new THREE.Vector3(0, 0, 1), 0x0000ff, 4.5); // Blue for Z
+scene.add(xAxis, yAxis, zAxis);
+
+function clearSceneArrows() {
+	scene.children = scene.children.filter(
+		(child) =>
+			!(child instanceof THREE.ArrowHelper) ||
+			child === xAxis ||
+			child === yAxis ||
+			child === zAxis
+	);
+}
+
+function getvs(R, w, noise_level) {
+	// Multiply R with the matrix of ws
+	let vs = [];
+	for (let i = 0; i < w.length; i++) {
+		let v = new THREE.Vector3(w[i].x, w[i].y, w[i].z).applyMatrix3(R);
+		vs.push(v + noise_level[i] * Math.random());
+	}
+	return vs;
+}
+
+function wabhas(ws, vs) {
+	// temporary return
+	let R_est = new THREE.Matrix3();
+	R_est.set(1, 0, 0, 0, 1, 0, 0, 0, 1);
+	return R_est;
+}
+
 addAxes(scene);
 const rotationMatrix = generateRotationMatrix(
 	new THREE.Vector3(1, -2, 0),
@@ -90,8 +134,48 @@ const rotationMatrix = generateRotationMatrix(
 );
 visualizeRotation(scene, rotationMatrix);
 
+// Create a random list of n=3 dimensional reference vectors
+const referenceVectors = [];
+const nvectors = 4;
+const scale = 5;
+for (let i = 0; i < nvectors; i++) {
+	referenceVectors.push(
+		new THREE.Vector3(
+			Math.random() * scale,
+			Math.random() * scale,
+			Math.random() * scale
+		)
+	);
+}
+console.log(referenceVectors);
+
+const noise_levels = [0.1, 0.1, 0.2];
+
+// extrapolate noise level to all vectors
+for (let i = 0; i < nvectors; i++) {
+	noise_levels.push(0.1);
+}
+
 function animate() {
 	requestAnimationFrame(animate);
+
+	// Clear previous arrows except the original axes
+	clearSceneArrows();
+
+	// Update dynamic A vector
+	const time = performance.now();
+	const A = updateA(time);
+
+	const rotationMatrix = generateRotationMatrix(A, B);
+	visualizeRotation(scene, rotationMatrix);
+
+	const vs = getvs(rotationMatrix, referenceVectors, noise_levels);
+
+	const R_est = wabhas(referenceVectors, vs);
+
+	// Visualize the estimated rotation matrix
+	visualizeRotation(scene, R_est);
+
 	orbit.update();
 	renderer.render(scene, camera);
 }
